@@ -8,9 +8,9 @@
     patterns: "{{ item.patterns }}"
     use_regex: True
   with_flattened:
-    - "{{ ocstore_shared_cache_path }}"
+    - "{{ ocstore_cache_path }}"
   register: ocstore_cache_files
-  when: ocstore_shared_cache_clean is defined and ocstore_shared_cache_clean == "yes"
+  when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
   no_log: True
 
 - name: ocStore | Cache | Delete cache files
@@ -20,5 +20,5 @@
   with_subelements:
      - "{{ ocstore_cache_files.results }}"
      - files
-  when: ocstore_shared_cache_clean is defined and ocstore_shared_cache_clean == "yes"
+  when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
   no_log: True
