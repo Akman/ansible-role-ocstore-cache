@@ -11,7 +11,6 @@
     - "{{ ocstore_cache_path }}"
   register: ocstore_cache_files
   when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
-  no_log: True
 
 - name: ocStore | Cache | Delete cache files
   file:
@@ -21,4 +20,3 @@
      - "{{ ocstore_cache_files.results }}"
      - files
   when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
-  no_log: True
