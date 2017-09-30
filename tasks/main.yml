@@ -12,11 +12,17 @@
   register: ocstore_cache_files
   when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
 
-- name: ocStore | Cache | Delete cache files
-  file:
-    path: "{{ item.1.path }}"
-    state: absent
-  with_subelements:
-     - "{{ ocstore_cache_files.results }}"
-     - files
+- name: ocStore | Cache | Build rm command list
+  set_fact:
+    ocstore_rm_cmd: |
+      {% for result in ocstore_cache_files.results %}
+        {% for item in result.files %}
+          rm -rf {{ item.path }};
+        {% endfor %}
+      {% endfor %}
+  when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
+
+- name: ocStore | Cache | Ensure cache files and folders absent
+  shell: "{{ ocstore_rm_cmd | regex_replace(';\\s+rm -rf ', ';rm -rf ') | trim }}"
+  changed_when: false
   when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
