@@ -22,7 +22,12 @@
       {% endfor %}
   when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
 
+- name: ocStore | Cache | Trim rm command list
+  set_fact:
+    ocstore_rm_cmd: "{{ ocstore_rm_cmd | regex_replace(';\\s+rm -rf ', ';rm -rf ') | trim }}"
+  when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
+
 - name: ocStore | Cache | Ensure cache files and folders absent
   shell: "{{ ocstore_rm_cmd | regex_replace(';\\s+rm -rf ', ';rm -rf ') | trim }}"
   changed_when: false
-  when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
+  when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes" and ocstore_rm_cmd != ''
