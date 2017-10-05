@@ -1,16 +1,41 @@
 ---
 # tasks/main.yml
 
+- name: ocStore | Cache | Build all cache file list
+  set_fact:
+    ocstore_cache_list:
+      - "{{ ocstore_system_cache }}"
+      - "{{ ocstore_image_cache }}"
+      - "{{ ocstore_vqmod_cache }}"
+  when: ocstore_cache_clean is defined and ocstore_cache_clean == "all"
+
+- name: ocStore | Cache | Build system cache file list
+  set_fact:
+    ocstore_cache_list:
+      - "{{ ocstore_system_cache }}"
+  when: ocstore_cache_clean is defined and ocstore_cache_clean == "system"
+  
+- name: ocStore | Cache | Build image cache file list
+  set_fact:
+    ocstore_cache_list:
+      - "{{ ocstore_image_cache }}"
+  when: ocstore_cache_clean is defined and ocstore_cache_clean == "image"
+  
+- name: ocStore | Cache | Build vqmod cache file list
+  set_fact:
+    ocstore_cache_list:
+      - "{{ ocstore_vqmod_cache }}"
+  when: ocstore_cache_clean is defined and ocstore_cache_clean == "vqmod"
+  
 - name: ocStore | Cache | Enumerate cache files
   find:
-    paths: "{{ ocstore_www_root }}/{{ ocstore_shared_dir }}/{{ item.path }}"
+    paths: "{{ ocstore_www_root }}/{{ ocstore_current_dir }}/{{ item.path }}"
     file_type: "any"
     patterns: "{{ item.patterns }}"
     use_regex: True
-  with_flattened:
-    - "{{ ocstore_cache_path }}"
+  with_flattened: "{{ ocstore_cache_list }}"
   register: ocstore_cache_files
-  when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
+  when: ocstore_cache_list is defined
 
 - name: ocStore | Cache | Build rm command list
   set_fact:
@@ -20,14 +45,13 @@
           rm -rf {{ item.path }};
         {% endfor %}
       {% endfor %}
-  when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
+  when: ocstore_cache_files is defined
 
 - name: ocStore | Cache | Trim rm command list
   set_fact:
     ocstore_rm_cmd: "{{ ocstore_rm_cmd | regex_replace(';\\s+rm -rf ', ';rm -rf ') | trim }}"
-  when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes"
+  when: ocstore_rm_cmd is defined
 
 - name: ocStore | Cache | Ensure cache files and folders absent
-  shell: "{{ ocstore_rm_cmd | regex_replace(';\\s+rm -rf ', ';rm -rf ') | trim }}"
-  changed_when: false
-  when: ocstore_cache_clean is defined and ocstore_cache_clean == "yes" and ocstore_rm_cmd != ''
+  shell: "{{ ocstore_rm_cmd }}"
+  when: ocstore_rm_cmd is defined and ocstore_rm_cmd != ''
