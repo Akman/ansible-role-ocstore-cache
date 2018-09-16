@@ -1,4 +1,4 @@
-# Ansible Role: ocstore-cache
+# Ansible Role: ocstore_cache
 
 Clean up ocStore cache.
 
@@ -18,7 +18,7 @@ None.
 
     - hosts: all
       roles:
-        - Akman.ocstore-cache
+        - Akman.ocstore_cache
 
 *Inside `vars/main.yml`*:
 
