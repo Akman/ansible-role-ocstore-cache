@@ -4,6 +4,7 @@
 dependencies: []
 
 galaxy_info:
+  role_name: ocstore_cache
   author: Akman
   description: Clean up ocStore cache
   license: "license (MIT)"
