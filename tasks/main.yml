@@ -55,4 +55,5 @@
 - name: ocStore | Cache | Ensure cache files and folders absent
   shell: "{{ ocstore_rm_cmd }}"
   when: ocstore_rm_cmd is defined and ocstore_rm_cmd != ''
-  warn=False
+  args:
+    warn: no
